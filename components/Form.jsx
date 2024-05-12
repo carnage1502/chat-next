@@ -53,7 +53,7 @@ const Form = ({ type }) => {
   return (
     <div className="auth">
       <div className="content">
-        <PiChatTeardropDotsFill className="text-red-500" size={"4rem"} />
+        <img src="/chat.svg" alt="logo" className="logo" />
 
         <form className="form" onSubmit={handleSubmit(onSubmit)}>
           {type === "register" && (
