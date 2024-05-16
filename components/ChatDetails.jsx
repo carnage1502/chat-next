@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Loader from "./Loader";
 import Link from "next/link";
 import { EmojiEmotions } from "@mui/icons-material";
+import MessageBox from "./MessageBox";
 
 const ChatDetails = ({ chatId }) => {
   const [loading, setLoading] = useState(true);
@@ -35,6 +36,22 @@ const ChatDetails = ({ chatId }) => {
     if (currentUser && chatId) getChatDetails();
   }, [currentUser, chatId]);
 
+  const sendText = async () => {
+    try {
+      const res = await fetch("/api/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chatId,
+          currentUserId: currentUser._id,
+          text,
+        }),
+      });
+      if (res.ok) setText("");
+    } catch (error) {
+      console.log(first);
+    }
+  };
   return loading ? (
     <Loader />
   ) : (
@@ -70,7 +87,11 @@ const ChatDetails = ({ chatId }) => {
         )}
       </div>
 
-      <div className="chat-body"></div>
+      <div className="chat-body">
+        {chat?.messages?.map((message, index) => (
+          <MessageBox key={index} message={message} currentUser={currentUser} />
+        ))}
+      </div>
       <div className="send-message">
         <div className="prepare-message">
           <EmojiEmotions
@@ -90,7 +111,7 @@ const ChatDetails = ({ chatId }) => {
             required
           />
         </div>
-        <div>
+        <div onClick={sendText}>
           <img src="/send.jpg" alt="send" className="send-icon" />
         </div>
       </div>
