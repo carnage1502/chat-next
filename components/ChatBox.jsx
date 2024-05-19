@@ -9,6 +9,10 @@ const ChatBox = ({ chat, currentUser, currentChatId }) => {
   const lastMessage =
     chat?.messages?.length > 0 && chat?.messages[chat?.messages.length - 1];
 
+  const seen = lastMessage?.seenBy?.find(
+    (member) => member._id === currentUser._id
+  );
+
   const router = useRouter();
 
   return (
@@ -40,12 +44,22 @@ const ChatBox = ({ chat, currentUser, currentChatId }) => {
           )}
 
           {!lastMessage && <p className="text-small-bold">Started a chat</p>}
+
+          <p
+            className={`last-message ${
+              seen ? "text-small-medium text-grey-3" : "text-small-bold"
+            }`}
+          >
+            {lastMessage?.text}
+          </p>
         </div>
       </div>
 
       <div>
         <p className="text-base-light text-grey-3">
-          {!lastMessage && format(new Date(chat?.createdAt), "p")}
+          {!lastMessage
+            ? format(new Date(chat?.createdAt), "p")
+            : format(new Date(chat?.lastMessageAt), "p")}
         </p>
       </div>
     </div>
