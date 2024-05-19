@@ -1,3 +1,4 @@
+import { pusherServer } from "@lib/pusher";
 import Chat from "@models/Chat";
 import User from "@models/User";
 import { connectToDB } from "@mongodb";
@@ -34,6 +35,10 @@ export const POST = async (req) => {
         );
       });
       Promise.all(updateAllMembers);
+      //Trigger a Pusher event for each member for new chat
+      chat.members.map((member) => {
+        pusherServer.trigger(member._id.toString(), "new-chat", chat);
+      });
     }
 
     return new Response(JSON.stringify(chat), { status: 200 });

@@ -1,10 +1,11 @@
 "use client";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Loader from "./Loader";
 import Link from "next/link";
 import { EmojiEmotions } from "@mui/icons-material";
 import MessageBox from "./MessageBox";
+import { pusherClient } from "@lib/pusher";
 
 const ChatDetails = ({ chatId }) => {
   const [loading, setLoading] = useState(true);
@@ -52,6 +53,30 @@ const ChatDetails = ({ chatId }) => {
       console.log(first);
     }
   };
+
+  useEffect(() => {
+    pusherClient.subscribe(chatId);
+
+    const handleMessage = async (newMessage) => {
+      setChat((prevChat) => {
+        return { ...prevChat, messages: [...prevChat.messages, newMessage] };
+      });
+    };
+    pusherClient.bind("new-message", handleMessage);
+
+    return () => {
+      pusherClient.unsubscribe(chatId);
+      pusherClient.unbind("new-message", handleMessage);
+    };
+  }, [chatId]);
+
+  //automatically scrolling to latest msg
+  const bottomRef = useRef(null);
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [chat?.messages]);
   return loading ? (
     <Loader />
   ) : (
@@ -91,6 +116,7 @@ const ChatDetails = ({ chatId }) => {
         {chat?.messages?.map((message, index) => (
           <MessageBox key={index} message={message} currentUser={currentUser} />
         ))}
+        <div ref={bottomRef} />
       </div>
       <div className="send-message">
         <div className="prepare-message">
