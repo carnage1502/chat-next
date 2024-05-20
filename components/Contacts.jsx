@@ -1,4 +1,5 @@
 "use client";
+
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import Loader from "./Loader";
@@ -9,8 +10,6 @@ const Contacts = () => {
   const [loading, setLoading] = useState(true);
   const [contacts, setContacts] = useState([]);
   const [search, setSearch] = useState("");
-
-  const router = useRouter();
 
   const { data: session } = useSession();
   const currentUser = session?.user;
@@ -23,8 +22,8 @@ const Contacts = () => {
       const data = await res.json();
       setContacts(data.filter((contact) => contact._id !== currentUser._id));
       setLoading(false);
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -32,9 +31,10 @@ const Contacts = () => {
     if (currentUser) getContacts();
   }, [currentUser, search]);
 
-  //select contacts
+  /* SELECT CONTACT */
   const [selectedContacts, setSelectedContacts] = useState([]);
   const isGroup = selectedContacts.length > 1;
+
   const handleSelect = (contact) => {
     if (selectedContacts.includes(contact)) {
       setSelectedContacts((prevSelectedContacts) =>
@@ -48,10 +48,12 @@ const Contacts = () => {
     }
   };
 
-  //set group chat name
+  /* ADD GROUP CHAT NAME */
   const [name, setName] = useState("");
 
-  //Create Chat
+  const router = useRouter();
+
+  /* CREATE CHAT */
   const createChat = async () => {
     const res = await fetch("/api/chats", {
       method: "POST",
@@ -74,7 +76,7 @@ const Contacts = () => {
   ) : (
     <div className="create-chat-container">
       <input
-        placeholder="Search content..."
+        placeholder="Search contact..."
         className="input-search"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
@@ -83,26 +85,28 @@ const Contacts = () => {
       <div className="contact-bar">
         <div className="contact-list">
           <p className="text-body-bold">Select or Deselect</p>
-          {contacts.map((user, index) => (
-            <div
-              key={index}
-              className="contact"
-              onClick={() => handleSelect(user)}
-            >
-              {selectedContacts.find((item) => item === user) ? (
-                <CheckCircle sx={{ color: "red" }} />
-              ) : (
-                <RadioButtonUnchecked />
-              )}
 
-              <img
-                src={user.profileImage || "/user.jpg"}
-                alt="profile"
-                className="profilePhoto"
-              />
-              <p className="text-base-solid">{user.username}</p>
-            </div>
-          ))}
+          <div className="flex flex-col flex-1 gap-5 overflow-y-scroll custom-scrollbar">
+            {contacts.map((user, index) => (
+              <div
+                key={index}
+                className="contact"
+                onClick={() => handleSelect(user)}
+              >
+                {selectedContacts.find((item) => item === user) ? (
+                  <CheckCircle sx={{ color: "red" }} />
+                ) : (
+                  <RadioButtonUnchecked />
+                )}
+                <img
+                  src={user.profileImage || "/assets/person.jpg"}
+                  alt="profile"
+                  className="profilePhoto"
+                />
+                <p className="text-base-bold">{user.username}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="create-chat">
@@ -111,7 +115,6 @@ const Contacts = () => {
               <div className="flex flex-col gap-3">
                 <p className="text-body-bold">Group Chat Name</p>
                 <input
-                  type="text"
                   placeholder="Enter group chat name..."
                   className="input-group-name"
                   value={name}
@@ -131,8 +134,12 @@ const Contacts = () => {
               </div>
             </>
           )}
-          <button className="btn" onClick={createChat}>
-            Find or Start a new chat!
+          <button
+            className="btn"
+            onClick={createChat}
+            disabled={selectedContacts.length === 0}
+          >
+            FIND OR START A NEW CHAT
           </button>
         </div>
       </div>

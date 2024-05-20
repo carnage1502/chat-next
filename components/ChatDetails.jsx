@@ -80,65 +80,71 @@ const ChatDetails = ({ chatId }) => {
   return loading ? (
     <Loader />
   ) : (
-    <div className="chat-details">
-      <div className="chat-header">
-        {chat?.isGroup ? (
-          <>
-            <Link href={`/chats/${chatId}/group-info`}>
+    <div className="pb-20">
+      <div className="chat-details">
+        <div className="chat-header">
+          {chat?.isGroup ? (
+            <>
+              <Link href={`/chats/${chatId}/group-info`}>
+                <img
+                  src={chat?.groupPhoto || "/group.png"}
+                  alt="group=photo"
+                  className="profilePhoto"
+                />
+              </Link>
+              <div className="text">
+                <p>
+                  {chat?.name} &#160; &#183; &#160; {chat?.members?.length}{" "}
+                  members
+                </p>
+              </div>
+            </>
+          ) : (
+            <>
               <img
-                src={chat?.groupPhoto || "/group.png"}
-                alt="group=photo"
+                src={otherMembers[0].profileImage || "/user.jpg"}
+                alt="profile-photo"
                 className="profilePhoto"
               />
-            </Link>
-            <div className="text">
-              <p>
-                {chat?.name} &#160; &#183; &#160; {chat?.members?.length}{" "}
-                members
-              </p>
-            </div>
-          </>
-        ) : (
-          <>
-            <img
-              src={otherMembers[0].profileImage || "/user.jpg"}
-              alt="profile-photo"
-              className="profilePhoto"
-            />
-            <div className="text">
-              <p>{otherMembers[0].username}</p>
-            </div>
-          </>
-        )}
-      </div>
-
-      <div className="chat-body">
-        {chat?.messages?.map((message, index) => (
-          <MessageBox key={index} message={message} currentUser={currentUser} />
-        ))}
-        <div ref={bottomRef} />
-      </div>
-      <div className="send-message">
-        <div className="prepare-message">
-          <EmojiEmotions
-            sx={{
-              fontSize: "35px",
-              color: "#737373",
-              cursor: "pointer",
-              "&:hover": { color: "red" },
-            }}
-          />
-          <input
-            type="text"
-            placeholder="Write a message..."
-            className="input-field"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            required
-          />
+              <div className="text">
+                <p>{otherMembers[0].username}</p>
+              </div>
+            </>
+          )}
         </div>
-        <div onClick={sendText}>
-          <img src="/send.jpg" alt="send" className="send-icon" />
+
+        <div className="chat-body">
+          {chat?.messages?.map((message, index) => (
+            <MessageBox
+              key={index}
+              message={message}
+              currentUser={currentUser}
+            />
+          ))}
+          <div ref={bottomRef} />
+        </div>
+        <div className="send-message">
+          <div className="prepare-message">
+            <EmojiEmotions
+              sx={{
+                fontSize: "35px",
+                color: "#737373",
+                cursor: "pointer",
+                "&:hover": { color: "red" },
+              }}
+            />
+            <input
+              type="text"
+              placeholder="Write a message..."
+              className="input-field"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              required
+            />
+          </div>
+          <div onClick={sendText}>
+            <img src="/send.jpg" alt="send" className="send-icon" />
+          </div>
         </div>
       </div>
     </div>
